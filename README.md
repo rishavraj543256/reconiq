@@ -29,6 +29,7 @@ For a Python-only local run:
 python -m venv .venv
 . .venv/bin/activate  # Windows: .venv\\Scripts\\activate
 pip install -e ".[test]"
+alembic upgrade head
 uvicorn app.main:app --reload
 ```
 
