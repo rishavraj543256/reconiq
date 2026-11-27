@@ -4,7 +4,10 @@ __pycache__/
 *.py[cod]
 *.db
 .pytest_cache/
+.pip-cache/
+pip-temp/
 .coverage
 htmlcov/
 frontend/node_modules/
+frontend/.npm-cache/
 frontend/dist/
