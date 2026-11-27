@@ -4,6 +4,19 @@ import { Activity, AlertTriangle, ArrowRightLeft, BarChart3, Bot, CheckCircle2, 
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 const API = import.meta.env.VITE_API_URL || "";
+async function downloadReport() {
+  const token = localStorage.getItem("reconiq_token");
+  const response = await fetch(`${API}/api/v1/reports/matches.csv`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  if (!response.ok) throw new Error(`Report download failed (${response.status}).`);
+  const url = URL.createObjectURL(await response.blob());
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "reconiq-matches.csv";
+  link.click();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
 type Dashboard = {total_transactions:number;matched_transactions:number;match_percentage:number;unmatched_transactions:number;discrepancy_amount:string;anomalies:number;pending_approvals:number;recent_runs:{id:string;status:string;matched:number;total:number;duration_ms:number}[]};
 async function request<T>(path:string, options:RequestInit={}):Promise<T>{const token=localStorage.getItem("reconiq_token");const response=await fetch(`${API}${path}`,{...options,headers:{...(options.body instanceof FormData?{}:{"Content-Type":"application/json"}),...(token?{Authorization:`Bearer ${token}`}:{})},});if(!response.ok)throw new Error((await response.json().catch(()=>({detail:"Request failed"}))).detail||"Request failed");return response.json();}
 
@@ -27,7 +40,7 @@ export default function App(){
   </>}
   {active==='Reconciliation'&&<Feature title="Deterministic reconciliation engine" description="Executes amount, date and fuzzy-reference strategies with stable tie-breaking and no double matching." action="Run reconciliation" onAction={()=>run.mutate()}/>} 
   {active==='Anomaly Detection'&&<Feature title="Isolation Forest anomaly detection" description="Analyzes actual tenant payment distributions. Signals are explicitly not labelled as confirmed fraud." action="Detect anomalies" onAction={()=>anomaly.mutate()}/>} 
-  {active==='Reports'&&<Feature title="Auditable exports" description="Download the tenant's actual reconciliation match evidence as CSV." action="Download match report" onAction={()=>window.open(`${API}/api/v1/reports/matches.csv`,'_blank')}/>} 
+  {active==='Reports'&&<Feature title="Auditable exports" description="Download the tenant's actual reconciliation match evidence as CSV." action="Download match report" onAction={()=>void downloadReport().catch(error=>setNotice(error.message))}/>} 
   {!['Overview','Reconciliation','Anomaly Detection','Reports'].includes(active)&&<Feature title={active} description="This module is backed by the versioned API and tenant-isolated financial data model. Use the OpenAPI documentation for the complete operational workflow."/>}
   </div>}</main></div>
 }

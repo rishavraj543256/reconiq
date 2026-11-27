@@ -1,5 +1,17 @@
 # ReconIQ
 
+- [Live demo](https://reconiq-rishavraj.netlify.app/)
+- [Interactive API documentation](https://reconiq-4xyh.onrender.com/docs)
+
+Open **Try Live Demo**, then select **Run reconciliation** and **Detect anomalies**. The production synthetic dataset contained 152 records. A verified run matched 71 of 80 invoices (88.75%) and flagged two anomalies. A fresh demo session retrieved the saved run, and the authenticated CSV endpoint returned HTTP 200.
+
+```mermaid
+flowchart LR
+    UI["React dashboard on Netlify"] -->|"HTTPS JSON and CSV"| API["FastAPI on Render"]
+    API --> Engine["Deterministic reconciliation and Isolation Forest"]
+    API --> DB[("Neon PostgreSQL")]
+```
+
 ReconIQ is an open-source financial reconciliation platform for finance teams, analysts, and auditors. It imports tenant-scoped financial records, deterministically matches invoices and payments, preserves evidence for every decision, and applies Isolation Forest to surface unusual payment patterns. Demo data is synthetic; detected anomalies are not claims of fraud.
 
 ## What works
