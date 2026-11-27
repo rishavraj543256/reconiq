@@ -1,0 +1,26 @@
+[
+  {
+    "records_per_side": 1000,
+    "duration_seconds": 0.3042,
+    "matches": 1000,
+    "accuracy": 1.0,
+    "false_matches": 0,
+    "peak_traced_memory_mb": 1.35
+  },
+  {
+    "records_per_side": 10000,
+    "duration_seconds": 2.6732,
+    "matches": 10000,
+    "accuracy": 1.0,
+    "false_matches": 0,
+    "peak_traced_memory_mb": 12.8
+  },
+  {
+    "records_per_side": 100000,
+    "duration_seconds": 35.4785,
+    "matches": 100000,
+    "accuracy": 1.0,
+    "false_matches": 0,
+    "peak_traced_memory_mb": 127.48
+  }
+]
