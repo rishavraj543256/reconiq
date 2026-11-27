@@ -1,0 +1,24 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment: {POSTGRES_DB: reconiq, POSTGRES_USER: reconiq, POSTGRES_PASSWORD: reconiq-local-only}
+    volumes: [reconiq-db:/var/lib/postgresql/data]
+    healthcheck: {test: ["CMD-SHELL", "pg_isready -U reconiq"], interval: 5s, timeout: 5s, retries: 10}
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--maxmemory", "128mb", "--maxmemory-policy", "allkeys-lru"]
+  api:
+    build: .
+    environment: {DATABASE_URL: postgresql+psycopg://reconiq:reconiq-local-only@db:5432/reconiq, REDIS_URL: redis://redis:6379/0, SECRET_KEY: local-compose-secret-change-before-deploying, CORS_ORIGINS: http://localhost:5173}
+    ports: ["8000:8000"]
+    depends_on: {db: {condition: service_healthy}, redis: {condition: service_started}}
+  worker:
+    build: .
+    command: ["celery", "-A", "app.worker", "worker", "--loglevel=INFO", "--concurrency=2"]
+    environment: {DATABASE_URL: postgresql+psycopg://reconiq:reconiq-local-only@db:5432/reconiq, REDIS_URL: redis://redis:6379/0, SECRET_KEY: local-compose-secret-change-before-deploying}
+    depends_on: [api]
+  frontend:
+    build: {context: frontend, args: {VITE_API_URL: http://localhost:8000}}
+    ports: ["5173:80"]
+    depends_on: [api]
+volumes: {reconiq-db: {}}
